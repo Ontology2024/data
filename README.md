@@ -17,8 +17,6 @@
 
 [**데모 보기**](https://ontology2024.github.io/data/)
 
-GitHub Pages를 통해 이 HTML 파일을 웹에서 바로 열 수 있습니다. 위 링크를 클릭하여 데이터를 기반으로 한 상호작용 맵을 확인해 보세요.
-
 ## 라이선스
 
 이 프로젝트는 [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.ko) 라이선스 하에 제공됩니다.  
