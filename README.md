@@ -16,8 +16,3 @@
 확인하고 싶은 위험도에 해당하는 버튼을 클릭하면 시각화가 활성화됩니다.
 
 [**데모 보기**](https://ontology2024.github.io/data/)
-
-## 라이선스
-
-이 프로젝트는 [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.ko) 라이선스 하에 제공됩니다.  
-비상업적인 목적으로 원본 그대로의 상태에서만 배포가 가능하며, 수정 및 상업적 사용은 금지됩니다.
