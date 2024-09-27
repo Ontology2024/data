@@ -13,8 +13,9 @@
 ## 데모
 
 다음은 데이터셋에서 도출된 주요 인사이트를 시각화한 인터랙티브 그리드 맵입니다. 아래의 링크를 클릭하여 바로 보실 수 있습니다.
+확인하고 싶은 위험도에 해당하는 버튼을 클릭하면 시각화가 활성화됩니다.
 
-[**데모 보기**](https://ontology2024.github.io/data/final_dataset/maps/cus_grid_map.html)
+[**데모 보기**](https://ontology2024.github.io/data/)
 
 GitHub Pages를 통해 이 HTML 파일을 웹에서 바로 열 수 있습니다. 위 링크를 클릭하여 데이터를 기반으로 한 상호작용 맵을 확인해 보세요.
 
