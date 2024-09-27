@@ -2,6 +2,8 @@
 
 이 리포지토리는 **Ontology2024** 프로젝트와 관련된 데이터셋과 시각화 자료를 포함하고 있습니다.
 
+![Figure 1](https://github.com/Ontology2024/data/blob/main/final_dataset/plots/Figure_1.png?raw=true)
+
 ## 내용물
 
 - **datasets/**: 카테고리별로 정리된 모든 데이터셋을 포함한 폴더입니다.
