@@ -6,10 +6,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
 
-# Directions for movement (up, down, left, right, and diagonals)
+# 움직일 수 있는 방향 케이스 (상하좌우, 대각선)
 diagonal_directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
 
-# Function to check if the coordinate is valid
+# 다익스트라 기반 경로 탐색 함수
 def is_valid(coord, grid):
     x, y = coord
     return 0 <= x < grid.shape[0] and 0 <= y < grid.shape[1]
@@ -35,7 +35,7 @@ def find_path_avoid_danger_with_diagonal(df, start, end):
         
         visited.add((x, y))
 
-        # Explore neighbors (including diagonal directions)
+        # 주변 탐색
         for dx, dy in diagonal_directions:
             nx, ny = x + dx, y + dy
             if is_valid((nx, ny), risks) and (nx, ny) not in visited:
@@ -55,27 +55,26 @@ def find_path_avoid_danger_with_diagonal(df, start, end):
     return path, risks[end]/len(path)
 
 
-# Function to create checkpoints based on direction changes
+# 체크포인트 생성 함수
 def create_checkpoints_on_direction_change(path):
-    checkpoints = [path[0]]  # Start with the first point
+    checkpoints = [path[0]]  # 첫번째 경로부터 시작
     prev_direction = None
 
     for i in range(1, len(path) - 1):
-        # Calculate current direction vector
+        # 현재 방향 확인
         current_direction = (path[i+1][0] - path[i][0], path[i+1][1] - path[i][1])
 
-        # If the direction changes, mark a checkpoint
+        # 방향이 바뀌면 체크포인트 추가
         if prev_direction is None or current_direction != prev_direction:
             checkpoints.append(path[i])
         
         prev_direction = current_direction
 
-    # Always include the last point as a checkpoint
     checkpoints.append(path[-1])
 
     return checkpoints
 
-# Function to check if a line between two points passes through a dangerous area
+# 위험한 경로를 지나는지 확인하는 함수
 def is_safe_path(df, point1, point2, danger_threshold, debug=False):
     x0, y0 = point1
     x1, y1 = point2
@@ -155,23 +154,22 @@ def optimize_checkpoints(grid, checkpoints, danger_threshold, debug=False):
     return optimized_checkpoints
 
 
-# Function to visualize the path and checkpoints
+# 경로 시각화 함수
 def visualize_path_with_checkpoints(df, path, checkpoints):
     fig, ax = plt.subplots(figsize=(10, 10))
 
-    # Convert DataFrame to 2D array for plotting (latitude and longitude as indices)
     danger_grid = df.pivot(index='Latitude', columns='Longitude', values='Danger Level').values
     im = ax.imshow(danger_grid, cmap='YlOrRd')
 
-    # Plot the path
+    # 경로 표시
     path_coords = list(zip(*path))
     ax.plot(path_coords[1], path_coords[0], color='blue', marker='o', linestyle='-', linewidth=2, markersize=5)
 
-    # Plot the checkpoints
+    # 체크포인트 표시
     checkpoints_coords = list(zip(*checkpoints))
     ax.scatter(checkpoints_coords[1], checkpoints_coords[0], color='red', marker='x', s=100, label='Checkpoints')
 
-    # Annotate danger levels
+    # 위험도 레벨 표시
     for i, row in df.iterrows():
         ax.text(row['Longitude'], row['Latitude'], int(row['Danger Level']), ha='center', va='center', color='black')
 
@@ -184,25 +182,22 @@ def visualize_path_with_checkpoints(df, path, checkpoints):
     plt.legend()
     plt.show()
 
-
+# 체크포인트 시각화 함수
 def visualize_checkpoints_with_labels_and_lines(df, checkpoints):
     fig, ax = plt.subplots(figsize=(10, 10))
 
-    # Convert DataFrame to 2D array for plotting (latitude and longitude as indices)
     danger_grid = df.pivot(index='Latitude', columns='Longitude', values='Danger Level').values
     im = ax.imshow(danger_grid, cmap='YlOrRd')
 
-    # Extract coordinates for checkpoints (latitude and longitude)
     checkpoints_coords = [(row['Latitude'], row['Longitude']) for idx, row in df.iterrows() if (row['Latitude'], row['Longitude']) in checkpoints]
 
-    # Plot the checkpoints
+    # 체크포인트 표시
     ax.scatter([y for _, y in checkpoints_coords], [x for x, _ in checkpoints_coords], color='green', marker='o', s=100, label='Checkpoints')
 
-    # Annotate each checkpoint with its index
     for idx, (x, y) in enumerate(checkpoints_coords):
         ax.text(y, x, str(idx + 1), ha='center', va='center', color='black', fontsize=12)
 
-    # Draw lines connecting the checkpoints
+    # 체크포인트 연결 라인 그리기
     ax.plot([y for _, y in checkpoints_coords], [x for x, _ in checkpoints_coords], color='blue', marker='', linestyle='-', linewidth=2, label='Path between Checkpoints')
 
     ax.set_title('Checkpoints with Labels and Lines')
@@ -214,7 +209,7 @@ def visualize_checkpoints_with_labels_and_lines(df, checkpoints):
     plt.legend()
     plt.show()
 
-# Creating a danger map with clusters of high danger areas (more dangerous zones)
+# 가상 케이스 제작
 np.random.seed(random.randrange(0,10000))
 large_danger_map = np.random.rand(100, 100)
 
@@ -225,7 +220,7 @@ for _ in range(20):
 large_danger_map = gaussian_filter(large_danger_map, sigma=3)
 large_danger_map = np.clip((large_danger_map / large_danger_map.max()) * 5, 0, 5).astype(int)
 
-# Convert the large_danger_map to a DataFrame with latitude, longitude, and danger level
+# 가상 케이스 데이타프레임으로 변환
 def danger_map_to_dataframe(grid):
     data = []
     rows, cols = grid.shape
@@ -235,23 +230,20 @@ def danger_map_to_dataframe(grid):
     
     return pd.DataFrame(data)
 
-# Convert the large_danger_map to a DataFrame
+# 가상 케이스 시험
 # danger_map_df = danger_map_to_dataframe(large_danger_map)
 
 file_path = 'final_dataset/freeze_data.csv'
 data = pd.read_csv(file_path)
 data = data[["latitude", "longitude", "normalized_est_score"]]
 
-def user_defined_scaling_and_filtering(df, start, end):
-    # latitude와 longitude에 사용자가 정의한 공식을 적용하고, 정수로 반올림
+def scaling_and_filtering(df, start, end):
     df['scaled_latitude'] = np.round((df['latitude'] - start[0]) * 2000).astype(int)
     df['scaled_longitude'] = np.round((df['longitude'] - start[1]) * 2000).astype(int)
     
-    # large_end 기준으로 최대값 설정
     max_latitude = np.round((end[0] - start[0]) * 2000).astype(int)
     max_longitude = np.round((end[1] - start[1]) * 2000).astype(int)
     
-    # 조건에 맞지 않는 행 제거 (음수이거나, 최대값 초과)
     df_filtered = df[(df['scaled_latitude'] >= 0) & (df['scaled_latitude'] <= max_latitude) &
                      (df['scaled_longitude'] >= 0) & (df['scaled_longitude'] <= max_longitude)]
     
@@ -270,7 +262,7 @@ def convert_relative_to_absolute(df, relative_coords):
             abs_longitude = matching_row.iloc[0]['longitude']
             absolute_coords.append((abs_latitude, abs_longitude))
         else:
-            # 해당 좌표가 없으면 None 또는 다른 메시지를 추가할 수 있음
+            # 해당 좌표가 없으면 None
             absolute_coords.append((None, None))
     
     return absolute_coords
@@ -283,24 +275,24 @@ def find_checkpoint(start, end, danger_threshold = 4, log=True, visualize=False)
     # start = (0, 0)
     # end = (99, 99)
 
-    danger_map_df = user_defined_scaling_and_filtering(data, start, end)
+    danger_map_df = scaling_and_filtering(data, start, end)
     danger_map_df = danger_map_df.rename(columns={
         "scaled_latitude": "Latitude",
         "scaled_longitude": "Longitude",
         "normalized_est_score": "Danger Level"
     })
 
-    # Calculate the safest path on the larger map with diagonal movement allowed
+    # 다익스트라
     safest_path_diagonal, avg_risk_diagonal = find_path_avoid_danger_with_diagonal(danger_map_df, (0,0), (np.round((end[0] - start[0]) * 2000).astype(int), np.round((end[1] - start[1]) * 2000).astype(int)))
 
     if avg_risk_diagonal < 0:
         print("No info")
         return [start, end]
     
-    # Create checkpoints based on direction change
+    # 방향 기준 체크포인트 생성
     checkpoints = create_checkpoints_on_direction_change(safest_path_diagonal)
 
-    # Optimize checkpoints by removing unnecessary ones (those in safe straight lines)
+    # 체크포인트 최소화 (체크포인트를 조합하어 일자로 이어봄 -> 기준치 이상 위험지역 없으면 -> 사이 체크포인트 삭제)
     optimized_checkpoints = optimize_checkpoints(danger_map_df, checkpoints, danger_threshold)
     abs_checkpoints = convert_relative_to_absolute(danger_map_df, optimized_checkpoints)
 
@@ -311,10 +303,10 @@ def find_checkpoint(start, end, danger_threshold = 4, log=True, visualize=False)
         return abs_checkpoints
 
     if visualize:
-        # Visualize the larger map with the path and optimized checkpoints
+        # 경로 시각화
         visualize_path_with_checkpoints(danger_map_df, safest_path_diagonal, optimized_checkpoints)
 
-        # Visualize only the checkpoints with labels showing their indices
+        # 체크포인트 시각화
         visualize_checkpoints_with_labels_and_lines(danger_map_df, optimized_checkpoints)
 
 
